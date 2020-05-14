@@ -1,10 +1,10 @@
-package main
+package netbox
 
 import "fmt"
 
 type Config struct {
-	Token     string
-	Url  string
+	Token string
+	Url   string
 }
 
 func (c *Config) Validate() error {

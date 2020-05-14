@@ -1,7 +1,6 @@
-package main
+package netbox
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -20,23 +19,23 @@ func Provider() *schema.Provider {
 				Description: descriptions["netbox api token"],
 			},
 			"url": &schema.Schema{
-				Type: schema.TypeString,
-				Optional: true,
-				Default: "",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "",
 				Description: descriptions["netbox main url"],
 			},
 		},
-		ConfigureContextFunc: configureProvider,
+		ConfigureFunc: configureProvider,
 	}
 }
-
-func configureProvider(d *schema.ResourceData) (interface{}, diag.Diagnostic) {
+func configureProvider(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
 		Token:    d.Get("token").(string),
 		Url: d.Get("url").(string),
 	}
 	if err := config.Validate(); err != nil {
-		return nil, diag.Diagnostic{}
+		return nil, err
 	}
-	return &config, diag.Diagnostic{}
+
+	return &config, nil
 }
