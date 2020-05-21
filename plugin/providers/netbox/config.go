@@ -1,7 +1,7 @@
 package netbox
 
 import (
-	"fmt"
+	"errors"
 	netboxClient "github.com/netbox-community/go-netbox/netbox/client"
 )
 
@@ -16,10 +16,10 @@ type Client struct {
 
 func (c *Config) Validate() error {
 	if c.Token == "" {
-		return fmt.Errorf("token must be specified")
+		return errors.New("token must be specified")
 	}
 	if c.URL == "" {
-		return fmt.Errorf("url must be specified")
+		return errors.New("url must be specified")
 	}
 	return nil
 }
