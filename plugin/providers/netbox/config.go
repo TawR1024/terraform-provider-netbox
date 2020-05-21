@@ -14,7 +14,7 @@ type Client struct {
 	NetboxClient netboxClient.NetBox
 }
 
-func (c *Config) Validate()  error {
+func (c *Config) Validate() error {
 	if c.Token == "" {
 		return fmt.Errorf("token must be specified")
 	}
@@ -23,4 +23,3 @@ func (c *Config) Validate()  error {
 	}
 	return nil
 }
-

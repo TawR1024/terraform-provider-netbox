@@ -25,19 +25,19 @@ func resourceVM() *schema.Resource {
 				Required: true,
 			},
 			"cores": &schema.Schema{
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Required: false,
 			},
 			"ram": &schema.Schema{
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Required: false,
 			},
 			"disk": &schema.Schema{
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Required: false,
 			},
 			"status": &schema.Schema{
-				Type: schema.TypeInt,
+				Type:     schema.TypeInt,
 				Required: false,
 			},
 		},
@@ -51,7 +51,7 @@ func resourceVMCreate(d *schema.ResourceData, m interface{}) error {
 	netboxVM.Name = &name
 	netboxVM.Tags = []string{}
 	netboxVM.Cluster = swag.Int64(int64(d.Get("cluster").(int)))
-	netboxVM.Status = d.Get("status").(int)
+	//netboxVM.Status = d.Get("status").(int)
 
 	netboxVM.Vcpus = swag.Int64(int64(d.Get("cores").(int)))
 	netboxVM.Memory = swag.Int64(d.Get("ram").(int64))
