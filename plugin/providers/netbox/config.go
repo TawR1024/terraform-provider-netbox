@@ -2,7 +2,7 @@ package netbox
 
 import (
 	"errors"
-	netboxClient "github.com/netbox-community/go-netbox/netbox/client"
+	"github.com/netbox-community/go-netbox/netbox/client"
 )
 
 type Config struct {
@@ -10,8 +10,9 @@ type Config struct {
 	Token string
 }
 
-type Client struct {
-	NetboxClient netboxClient.NetBox
+type ProviderNetboxClient struct {
+	client        *client.NetBox
+	configuration Config
 }
 
 func (c *Config) Validate() error {
@@ -20,6 +21,14 @@ func (c *Config) Validate() error {
 	}
 	if c.URL == "" {
 		return errors.New("url must be specified")
+	}
+	return nil
+}
+
+func (client * ProviderNetboxClient)CheckConnection() error{
+	_, err := client.client.Dcim.DcimRacksList(nil,nil)
+	if err != nil{
+		return err
 	}
 	return nil
 }

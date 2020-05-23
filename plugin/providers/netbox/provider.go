@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	netboxClient "github.com/netbox-community/go-netbox/netbox/client"
+	"log"
 )
 
 var descriptions map[string]string
@@ -15,7 +16,9 @@ func Provider() terraform.ResourceProvider {
 		ResourcesMap: map[string]*schema.Resource{
 			"netbox_virtual_machine": resourceVM(),
 		},
-		DataSourcesMap: map[string]*schema.Resource{},
+		DataSourcesMap: map[string]*schema.Resource{
+			"netbox_virtual_machine": dataSourceNetboxVM(),
+		},
 		Schema: map[string]*schema.Schema{
 			"token": &schema.Schema{
 				Type:        schema.TypeString,
@@ -33,6 +36,7 @@ func Provider() terraform.ResourceProvider {
 		ConfigureFunc: configureProvider,
 	}
 }
+
 func configureProvider(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
 		URL:   d.Get("url").(string),
@@ -45,5 +49,15 @@ func configureProvider(d *schema.ResourceData) (interface{}, error) {
 	t := runtimeclient.New(config.URL, "/api", []string{"https"})
 	t.DefaultAuthentication = runtimeclient.APIKeyAuth("Authorization", "header", "Token "+config.Token)
 	c := netboxClient.New(t, strfmt.Default)
-	return &c, nil
+	cs := ProviderNetboxClient{
+		client:        c,
+		configuration: config,
+	}
+
+	connectionOK := cs.CheckConnection()
+	if connectionOK != nil {
+		log.Printf("[DEBUG] provider.go CheckConnection() FAILED")
+	}
+
+	return &cs, nil
 }
