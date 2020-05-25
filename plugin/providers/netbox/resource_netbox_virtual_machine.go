@@ -1,11 +1,13 @@
 package netbox
 
 import (
+	"log"
+
 	"github.com/go-openapi/swag"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/netbox-community/go-netbox/netbox/client/virtualization"
 	"github.com/netbox-community/go-netbox/netbox/models"
-	"log"
+
 	"strconv"
 )
 
@@ -84,19 +86,19 @@ func resourceVMCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	log.Print("VM ID is: ", res.Payload.ID)
-	d.SetId(strconv.FormatInt(res.Payload.ID,10))
+	d.SetId(strconv.FormatInt(res.Payload.ID, 10))
 	d.Set("vm_id", res.Payload.ID)
-	return resourceVMRead(d,m)
+	return resourceVMRead(d, m)
 }
 
 func resourceVMRead(d *schema.ResourceData, m interface{}) error {
 	c := m.(*ProviderNetboxClient).client
 	name := d.Get("name").(string)
-	params :=virtualization.NewVirtualizationVirtualMachinesListParams()
+	params := virtualization.NewVirtualizationVirtualMachinesListParams()
 	params.WithName(&name)
-	res, err := c.Virtualization.VirtualizationVirtualMachinesList(params,nil)
-	if err != nil{
-		log.Print("[DEBUG] Cant read VM info resourceVMRead() ",err)
+	res, err := c.Virtualization.VirtualizationVirtualMachinesList(params, nil)
+	if err != nil {
+		log.Print("[DEBUG] Cant read VM info resourceVMRead() ", err)
 	}
 	d.Set("vm_id", res.Payload.Results[0].ID)
 	d.Set("name", res.Payload.Results[0].Name)
@@ -122,26 +124,26 @@ func resourceVMUpdate(d *schema.ResourceData, m interface{}) error {
 	data.Tags = []string{}
 
 	params := virtualization.NewVirtualizationVirtualMachinesPartialUpdateParams()
-	vmId:= d.Get("vm_id").(int)
+	vmId := d.Get("vm_id").(int)
 	params.WithID(int64(vmId))
 	params.WithData(data)
 	_, err := c.Virtualization.VirtualizationVirtualMachinesPartialUpdate(params, nil)
-	if err != nil{
+	if err != nil {
 		log.Print("[DEBUG] Update VM failed\n", err)
-	}else{
+	} else {
 		log.Print("Updated...")
 	}
 
-	return resourceVMRead(d,m)
+	return resourceVMRead(d, m)
 }
 
 func resourceVMDelete(d *schema.ResourceData, m interface{}) error {
 	c := m.(*ProviderNetboxClient).client
 	params := virtualization.NewVirtualizationVirtualMachinesDeleteParams()
-	vmId:= d.Get("vm_id").(int)
+	vmId := d.Get("vm_id").(int)
 	params.WithID(int64(vmId))
 	_, err := c.Virtualization.VirtualizationVirtualMachinesDelete(params, nil)
-	if err != nil{
+	if err != nil {
 		log.Print("[DEBUG] Delete VM failed\n", err)
 	}
 

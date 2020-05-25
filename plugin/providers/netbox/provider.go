@@ -1,12 +1,13 @@
 package netbox
 
 import (
-	runtimeclient "github.com/go-openapi/runtime/client"
+	"log"
+
+	runtimeClient "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	netboxClient "github.com/netbox-community/go-netbox/netbox/client"
-	"log"
 )
 
 var descriptions map[string]string
@@ -46,14 +47,13 @@ func configureProvider(d *schema.ResourceData) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	t := runtimeclient.New(config.URL, "/api", []string{"https"})
-	t.DefaultAuthentication = runtimeclient.APIKeyAuth("Authorization", "header", "Token "+config.Token)
+	t := runtimeClient.New(config.URL, "/api", []string{"https"})
+	t.DefaultAuthentication = runtimeClient.APIKeyAuth("Authorization", "header", "Token "+config.Token)
 	c := netboxClient.New(t, strfmt.Default)
 	cs := ProviderNetboxClient{
 		client:        c,
 		configuration: config,
 	}
-
 	connectionOK := cs.CheckConnection()
 	if connectionOK != nil {
 		log.Printf("[DEBUG] provider.go CheckConnection() FAILED")

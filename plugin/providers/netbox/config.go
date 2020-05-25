@@ -2,6 +2,7 @@ package netbox
 
 import (
 	"errors"
+
 	"github.com/netbox-community/go-netbox/netbox/client"
 )
 
@@ -25,9 +26,9 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-func (client * ProviderNetboxClient)CheckConnection() error{
-	_, err := client.client.Dcim.DcimRacksList(nil,nil)
-	if err != nil{
+func (client *ProviderNetboxClient) CheckConnection() error {
+	_, err := client.client.Dcim.DcimRacksList(nil, nil)
+	if err != nil {
 		return err
 	}
 	return nil
