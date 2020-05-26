@@ -23,15 +23,15 @@ func Provider() terraform.ResourceProvider {
 		Schema: map[string]*schema.Schema{
 			"token": &schema.Schema{
 				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "",
+				Required:    true,
 				Description: descriptions["netbox api token"],
+				DefaultFunc: schema.EnvDefaultFunc("TF_NETBOX_TOKEN", nil),
 			},
 			"url": &schema.Schema{
 				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "",
+				Required:    true,
 				Description: descriptions["netbox main url"],
+				DefaultFunc: schema.EnvDefaultFunc("TF_NETBOX_URL", nil),
 			},
 		},
 		ConfigureFunc: configureProvider,
@@ -51,7 +51,7 @@ func configureProvider(d *schema.ResourceData) (interface{}, error) {
 	t.DefaultAuthentication = runtimeClient.APIKeyAuth("Authorization", "header", "Token "+config.Token)
 	c := netboxClient.New(t, strfmt.Default)
 	cs := ProviderNetboxClient{
-		client:        c,
+		netboxClient:  c,
 		configuration: config,
 	}
 	connectionOK := cs.CheckConnection()

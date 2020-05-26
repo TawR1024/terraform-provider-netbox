@@ -12,7 +12,7 @@ type Config struct {
 }
 
 type ProviderNetboxClient struct {
-	client        *client.NetBox
+	netboxClient  *client.NetBox
 	configuration Config
 }
 
@@ -27,7 +27,7 @@ func (c *Config) Validate() error {
 }
 
 func (client *ProviderNetboxClient) CheckConnection() error {
-	_, err := client.client.Dcim.DcimRacksList(nil, nil)
+	_, err := client.netboxClient.Dcim.DcimRacksList(nil, nil)
 	if err != nil {
 		return err
 	}
