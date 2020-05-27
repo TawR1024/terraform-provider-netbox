@@ -11,7 +11,7 @@ import (
 	"strconv"
 )
 
-func resourceVM() *schema.Resource {
+func resourceNetboxVirtualMachine() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceVMCreate,
 		Read:   resourceVMRead,

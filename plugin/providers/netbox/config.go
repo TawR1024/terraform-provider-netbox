@@ -26,8 +26,8 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-func (client *ProviderNetboxClient) CheckConnection() error {
-	_, err := client.netboxClient.Dcim.DcimRacksList(nil, nil)
+func (c *ProviderNetboxClient) CheckConnection() error {
+	_, err := c.netboxClient.Dcim.DcimRacksList(nil, nil)
 	if err != nil {
 		return err
 	}

@@ -15,7 +15,8 @@ var descriptions map[string]string
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		ResourcesMap: map[string]*schema.Resource{
-			"netbox_virtual_machine": resourceVM(),
+			"netbox_virtual_machine": resourceNetboxVirtualMachine(),
+			"netbox_rack":            resourceNetboxRack(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"netbox_virtual_machine": dataSourceNetboxVM(),
