@@ -26,7 +26,11 @@ func resourceNetboxVirtualMachine() *schema.Resource {
 				Required: true,
 			},
 			"cluster": &schema.Schema{
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
+				Required: true,
+			},
+			"tenant": &schema.Schema{
+				Type:     schema.TypeString,
 				Required: true,
 			},
 			"status": &schema.Schema{
@@ -54,13 +58,14 @@ func resourceNetboxVirtualMachine() *schema.Resource {
 }
 
 func resourceVMCreate(d *schema.ResourceData, m interface{}) error {
-	c := m.(*ProviderNetboxClient).netboxClient
+	c := m.(*ProviderNetboxClient)
 	netboxVM := new(models.WritableVirtualMachineWithConfigContext)
 	name := d.Get("name").(string)
 
 	netboxVM.Name = &name
 	netboxVM.Tags = []string{}
-	netboxVM.Cluster = swag.Int64(int64(d.Get("cluster").(int)))
+	netboxVM.Cluster = c.GetClusterID(swag.String(d.Get("cluster").(string)))
+	netboxVM.Tenant = c.GetTenantId(swag.String(d.Get("tenant").(string)))
 	netboxVM.Status = int64(d.Get("status").(int))
 	netboxVM.Vcpus = swag.Int64(int64(d.Get("cores").(int)))
 	netboxVM.Memory = swag.Int64(int64(d.Get("ram").(int)))
@@ -69,7 +74,7 @@ func resourceVMCreate(d *schema.ResourceData, m interface{}) error {
 	params := virtualization.NewVirtualizationVirtualMachinesCreateParams()
 	params.WithData(netboxVM)
 
-	res, err := c.Virtualization.VirtualizationVirtualMachinesCreate(params, nil)
+	res, err := c.netboxClient.Virtualization.VirtualizationVirtualMachinesCreate(params, nil)
 	if err != nil {
 		log.Print(err)
 		return err
@@ -96,7 +101,8 @@ func resourceVMRead(d *schema.ResourceData, m interface{}) error { //todo: Bug -
 		log.Print("[DEBUG] Cant read VM info resourceVMRead() ", err)
 	}
 	d.Set("name", res.Payload.Results[0].Name)
-	d.Set("cluster", res.Payload.Results[0].Cluster.ID)
+	d.Set("cluster", res.Payload.Results[0].Cluster.Name)
+	d.Set("tenant", res.Payload.Results[0].Tenant.Name)
 	d.Set("cores", res.Payload.Results[0].Vcpus)
 	d.Set("ram", res.Payload.Results[0].Memory)
 	d.Set("disk", res.Payload.Results[0].Disk)
@@ -107,16 +113,17 @@ func resourceVMRead(d *schema.ResourceData, m interface{}) error { //todo: Bug -
 }
 
 func resourceVMUpdate(d *schema.ResourceData, m interface{}) error {
-	c := m.(*ProviderNetboxClient).netboxClient
-	data := new(models.WritableVirtualMachineWithConfigContext)
+	c := m.(*ProviderNetboxClient)
+	netboxVM := new(models.WritableVirtualMachineWithConfigContext)
 	name := swag.String(d.Get("name").(string))
 
-	data.Name = name
-	data.Cluster = swag.Int64(int64(d.Get("cluster").(int)))
-	data.Disk = swag.Int64(int64(d.Get("disk").(int)))
-	data.Vcpus = swag.Int64(int64(d.Get("cores").(int)))
-	data.Memory = swag.Int64(int64(d.Get("ram").(int)))
-	data.Tags = []string{}
+	netboxVM.Name = name
+	netboxVM.Cluster = c.GetClusterID(swag.String(d.Get("cluster").(string)))
+	netboxVM.Tenant = c.GetTenantId(swag.String(d.Get("tenant").(string)))
+	netboxVM.Disk = swag.Int64(int64(d.Get("disk").(int)))
+	netboxVM.Vcpus = swag.Int64(int64(d.Get("cores").(int)))
+	netboxVM.Memory = swag.Int64(int64(d.Get("ram").(int)))
+	netboxVM.Tags = []string{}
 
 	params := virtualization.NewVirtualizationVirtualMachinesPartialUpdateParams()
 	vmId, err := strconv.Atoi(d.Id())
@@ -124,8 +131,8 @@ func resourceVMUpdate(d *schema.ResourceData, m interface{}) error {
 		log.Print("string converting failed")
 	}
 	params.WithID(int64(vmId))
-	params.WithData(data)
-	_, err = c.Virtualization.VirtualizationVirtualMachinesPartialUpdate(params, nil)
+	params.WithData(netboxVM)
+	_, err = c.netboxClient.Virtualization.VirtualizationVirtualMachinesPartialUpdate(params, nil)
 	if err != nil {
 		log.Print("[DEBUG] Update VM failed\n", err)
 	} else {
