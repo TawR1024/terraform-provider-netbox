@@ -17,6 +17,7 @@ var status = map[string]int64{
 
 func (c *ProviderNetboxClient) GetSiteID(siteName *string) *int64 {
 	params := dcim.NewDcimSitesListParams()
+	//siteSlug := toslug(*siteName)
 	params.WithName(siteName)
 	res, err := c.netboxClient.Dcim.DcimSitesList(params, nil)
 	if err != nil {
@@ -47,7 +48,7 @@ func (c *ProviderNetboxClient) GetClusterID(clusterName *string) *int64 {
 
 func (c *ProviderNetboxClient) GetDeviceTypeId(deviceTypeName *string) *int64 {
 	params := dcim.NewDcimDeviceTypesListParams()
-	slug := toslug(*deviceTypeName)
+	slug := toslug2(*deviceTypeName)
 	params.WithSlug(&slug)
 	res, err := c.netboxClient.Dcim.DcimDeviceTypesList(params, nil)
 	if err != nil {
@@ -71,7 +72,8 @@ func (c *ProviderNetboxClient) GetDeviceRoleId(deviceRoleName *string) *int64 {
 func (c *ProviderNetboxClient) GetRackId(rackName *string, site *string) *int64 {
 	params := dcim.NewDcimRacksListParams()
 	params.WithName(rackName)
-	params.WithSite(site)
+	siteSlug := toslug(*site)
+	params.WithSite(&siteSlug)
 	res, err := c.netboxClient.Dcim.DcimRacksList(params, nil)
 	if err != nil {
 		log.Print("[DEBUG] Cant Get Rack ID", err)
@@ -80,5 +82,9 @@ func (c *ProviderNetboxClient) GetRackId(rackName *string, site *string) *int64 
 }
 
 func toslug(str string) string {
+	return strings.ToLower(strings.ReplaceAll(str, ".", "-"))
+}
+
+func toslug2(str string) string {
 	return strings.ToLower(strings.ReplaceAll(str, "-", "_"))
 }

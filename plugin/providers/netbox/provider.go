@@ -18,9 +18,8 @@ func Provider() terraform.ResourceProvider {
 			"netbox_virtual_machine": resourceNetboxVirtualMachine(),
 			"netbox_rack":            resourceNetboxRack(),
 			"netbox_device":          resourceNetboxDevice(),
-		},
-		DataSourcesMap: map[string]*schema.Resource{
-			"netbox_virtual_machine": dataSourceNetboxVM(),
+			"netbox_interface":       resourceNetboxInterface(),
+			//"netbox_service":         resourceNetboxService(),
 		},
 		Schema: map[string]*schema.Schema{
 			"token": &schema.Schema{
