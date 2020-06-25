@@ -1,6 +1,7 @@
 package netbox
 
 import (
+	"github.com/go-openapi/swag"
 	"log"
 	"strings"
 
@@ -17,8 +18,8 @@ var status = map[string]int64{
 
 func (c *ProviderNetboxClient) GetSiteID(siteName *string) *int64 {
 	params := dcim.NewDcimSitesListParams()
-	//siteSlug := toslug(*siteName)
-	params.WithName(siteName)
+	siteSlug := siteSlug(*siteName)
+	params.WithSlug(swag.String(siteSlug))
 	res, err := c.netboxClient.Dcim.DcimSitesList(params, nil)
 	if err != nil {
 		log.Print("[DEBUG] Cant get site id ", err)
@@ -72,13 +73,13 @@ func (c *ProviderNetboxClient) GetDeviceRoleId(deviceRoleName *string) *int64 {
 func (c *ProviderNetboxClient) GetRackId(rackName *string, site *string) *int64 {
 	params := dcim.NewDcimRacksListParams()
 	params.WithName(rackName)
-	siteSlug := toslug(*site)
+	siteSlug := siteSlug(*site)
 	params.WithSite(&siteSlug)
 	res, err := c.netboxClient.Dcim.DcimRacksList(params, nil)
 	if err != nil {
 		log.Print("[DEBUG] Cant Get Rack ID", err)
 	}
-	return &res.Payload.Results[0].ID
+	return &res.Payload.Results[0].ID	
 }
 
 func toslug(str string) string {
@@ -87,6 +88,10 @@ func toslug(str string) string {
 
 func toslug2(str string) string {
 	return strings.ToLower(strings.ReplaceAll(str, "-", "_"))
+}
+
+func siteSlug(str string) string {
+	return strings.ToLower(strings.ReplaceAll(strings.ReplaceAll(str,".", "_" ),"-","_"))
 }
 
 func (c *ProviderNetboxClient) GetInterfaceID(deviceName, interfaceName *string) (interfaceId *int64) {

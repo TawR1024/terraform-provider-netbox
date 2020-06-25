@@ -122,7 +122,7 @@ func resourceDeviceRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("name", res.Payload.Results[0].Name)
 	d.Set("site", res.Payload.Results[0].Site.Name)
 	d.Set("tenant", res.Payload.Results[0].Tenant.Name)
-	d.Set("type", res.Payload.Results[0].DeviceType.DisplayName)
+	d.Set("type", res.Payload.Results[0].DeviceType.Model)
 	d.Set("role", res.Payload.Results[0].DeviceRole.Name)
 	d.Set("rack", res.Payload.Results[0].Rack.Name)
 	d.Set("position", res.Payload.Results[0].Position)
