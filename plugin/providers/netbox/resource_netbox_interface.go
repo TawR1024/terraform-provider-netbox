@@ -108,7 +108,7 @@ func resourceInterfaceRead(d *schema.ResourceData, m interface{}) error { //todo
 	if err != nil {
 		log.Print("[DEBUG] Cant read Interface info resourceInterfaceRead() ", err)
 	}
-	d.Set("name", res.Payload.ID)
+	d.Set("name", res.Payload.Name)
 	d.Set("type", res.Payload.Type)
 	d.Set("device", res.Payload.Device.ID)
 
