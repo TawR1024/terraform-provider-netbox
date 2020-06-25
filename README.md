@@ -5,7 +5,7 @@
 
 ### This provider does't work with API version greater than 2.6
 
-[terraform manifest example](main.tf)
+[terraform manifest example](main.stat.9.tf.tmp)
 
 
 # TODO List:
