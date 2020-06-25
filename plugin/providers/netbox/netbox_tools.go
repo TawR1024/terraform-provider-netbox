@@ -88,3 +88,16 @@ func toslug(str string) string {
 func toslug2(str string) string {
 	return strings.ToLower(strings.ReplaceAll(str, "-", "_"))
 }
+
+func (c *ProviderNetboxClient) GetInterfaceID(deviceName, interfaceName *string) (interfaceId *int64) {
+	params := dcim.NewDcimInterfacesListParams()
+	params.WithDevice(deviceName)
+	params.WithName(interfaceName)
+
+	res, err := c.netboxClient.Dcim.DcimInterfacesList(params, nil)
+	if err != nil {
+		log.Print("Cant Get Inteface ID ", err)
+	}
+
+	return &res.Payload.Results[0].ID
+}
