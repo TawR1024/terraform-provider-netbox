@@ -2,3 +2,5 @@
 terraform-provider-netbox
 
 
+/.terraform/
+terrafom-provider-netbox
