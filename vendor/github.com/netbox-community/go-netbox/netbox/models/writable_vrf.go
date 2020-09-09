@@ -82,7 +82,7 @@ type WritableVRF struct {
 	Rd *string `json:"rd,omitempty"`
 
 	// tags
-	Tags []string `json:"tags"`
+	Tags []string `json:"tags,omitempty"`
 
 	// Tenant
 	Tenant *int64 `json:"tenant,omitempty"`
