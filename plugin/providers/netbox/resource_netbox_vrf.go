@@ -41,17 +41,16 @@ func resourceVRFCreate(d *schema.ResourceData, m interface{}) error {
 	name := d.Get("name").(string)
 	netboxVRF.Name = &name
 	netboxVRF.Tenant = c.GetTenantId(swag.String(d.Get("tenant").(string)))
-
 	params.WithData(netboxVRF)
-
 	res, err := c.netboxClient.IPAM.IPAMVrfsCreate(params, nil)
 	if err != nil {
 		log.Print(err)
 		return err
 	}
-	log.Print("Interface ID is: ", res.Payload.ID)
+	log.Print("Vrf ID is: ", res.Payload.ID)
 	d.SetId(strconv.FormatInt(res.Payload.ID, 10))
-	return resourceVMRead(d, m)
+	//return resourceVRFRead(d, m)
+	return nil
 }
 
 func resourceVRFRead(d *schema.ResourceData, m interface{}) error {
@@ -66,16 +65,48 @@ func resourceVRFRead(d *schema.ResourceData, m interface{}) error {
 	}
 	res, err := c.IPAM.IPAMVrfsList(params, nil)
 	if err != nil {
-		log.Print("[DEBUG] Cant read Rack info resourceDeviceRead() ", err)
+		log.Print("[DEBUG] Cant read Vrf info resourceVRFRead() ", err)
 	}
 	d.Set("name", res.Payload.Results[0].Name)
 	d.Set("tenant", res.Payload.Results[0].Tenant.Name)
 	return nil
 }
-func resourceVRFUpdate(data *schema.ResourceData, m interface{}) error {
-	return nil
+func resourceVRFUpdate(d *schema.ResourceData, m interface{}) error {
+	c := m.(*ProviderNetboxClient)
+	netboxVrf := new(models.WritableVRF)
+	name := d.Get("name").(string)
+
+	netboxVrf.Name = &name
+	netboxVrf.Tenant = c.GetTenantId(swag.String(d.Get("tenant").(string)))
+	params := ipam.NewIPAMVrfsPartialUpdateParams()
+	vrfID, err := strconv.Atoi(d.Id())
+	if err != nil {
+		log.Print("string converting failed")
+	}
+	params.WithID(int64(vrfID))
+	params.WithData(netboxVrf)
+	_, err = c.netboxClient.IPAM.IPAMVrfsPartialUpdate(params, nil)
+	if err != nil {
+		log.Print("[DEBUG] Update Vrf failed\n", err)
+	} else {
+		log.Print("Updated...")
+	}
+
+	return resourceVRFRead(d, m)
 }
 
-func resourceVRFDelete(data *schema.ResourceData, m interface{}) error {
+func resourceVRFDelete(d *schema.ResourceData, m interface{}) error {
+	c := m.(*ProviderNetboxClient).netboxClient
+	params := ipam.NewIPAMVrfsDeleteParams()
+	rackID, err := strconv.Atoi(d.Id())
+	if err != nil {
+		log.Print("string converting failed")
+	}
+	params.WithID(int64(rackID))
+	_, err = c.IPAM.IPAMVrfsDelete(params, nil)
+	if err != nil {
+		log.Print("[DEBUG] Delete VRF failed\n", err)
+	}
+
 	return nil
 }
