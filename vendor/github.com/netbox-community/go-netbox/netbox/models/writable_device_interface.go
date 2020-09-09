@@ -104,14 +104,14 @@ type WritableDeviceInterface struct {
 
 	// tagged vlans
 	// Unique: true
-	TaggedVlans []int64 `json:"tagged_vlans"`
+	TaggedVlans []int64 `json:"tagged_vlans,omitempty"`
 
 	// tags
-	Tags []string `json:"tags"`
+	Tags []string `json:"tags,omitempty"`
 
 	// Type
 	// Enum: [0 200 800 1000 1120 1130 1150 1170 1050 1100 1200 1300 1310 1320 1350 1400 1420 1500 1510 1650 1520 1550 1600 1700 1750 2600 2610 2620 2630 2640 2810 2820 2830 6100 6200 6300 6400 6500 6600 6700 3010 3020 3040 3080 3160 3320 3400 4000 4010 4040 4050 5000 5050 5100 5150 5200 5300 5310 5320 5330 32767]
-	Type int64 `json:"type,omitempty"`
+	Type int64 `json:"type"`
 
 	// Untagged VLAN
 	UntaggedVlan *int64 `json:"untagged_vlan,omitempty"`

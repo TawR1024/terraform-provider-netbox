@@ -1,0 +1,181 @@
+//package netbox
+//
+//import (
+//	"github.com/go-openapi/strfmt"
+//	"github.com/go-openapi/swag"
+//	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+//	"github.com/netbox-community/go-netbox/netbox/client/dcim"
+//	"github.com/netbox-community/go-netbox/netbox/client/ipam"
+//	"github.com/netbox-community/go-netbox/netbox/models"
+//	"log"
+//	"strconv"
+//	"time"
+//)
+//
+//package netbox
+//
+//import (
+//"log"
+//"strconv"
+//
+//"github.com/netbox-community/go-netbox/netbox/models"
+//
+//"github.com/go-openapi/swag"
+//"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+//"github.com/netbox-community/go-netbox/netbox/client/dcim"
+//)
+//
+//func resourceNetboxService() *schema.Resource {
+//	return &schema.Resource{
+//		Create: resourceServiceCreate,
+//		Read:   resourceServiceRead,
+//		Update: resourceServiceUpdate,
+//		Delete: resourceServiceDelete,
+//		Importer: &schema.ResourceImporter{
+//			State: schema.ImportStatePassthrough,
+//		},
+//		Schema: map[string]*schema.Schema{
+//			"name": &schema.Schema{
+//				Type:     schema.TypeString,
+//				Required: true,
+//			},
+//			"port": &schema.Schema{
+//				Type:        schema.TypeInt,
+//				Required:    true,
+//				Description: "service port",
+//			},
+//			"protocol": &schema.Schema{
+//				Type:        schema.TypeString,
+//				Required:    true,
+//				Description: "TCP or UDP",
+//			},
+//			"virtual_machine": &schema.Schema{
+//				Type:     schema.TypeString,
+//				Optional: true,
+//				Description: "virtual machime FQDN",
+//			},
+//			"device": &schema.Schema{
+//				Type:     schema.TypeString,
+//				Optional: true,
+//				Description: "Device where service is runnig",
+//			},
+//			"ipaddresses": &schema.Schema{
+//				Type:        schema.TypeString,
+//				Optional:    true,
+//			},
+//			"description": &schema.Schema{
+//				Type:        schema.TypeBool,
+//				Optional:    true,
+//				Description: "Descending units",
+//			},
+//			"created": &schema.Schema{
+//				Type:        schema.TypeString,
+//				Optional:    true,
+//				Description: "Date Time",
+//			},
+//			//"custom_fields": &schema.Schema{
+//			//	Type:        schema.TypeBool,
+//			//	Required:    true,
+//			//	Description: "Descending units",
+//			//},
+//		},
+//	}
+//}
+//
+//func resourceServiceCreate(d *schema.ResourceData, m interface{}) error {
+//	c := m.(*ProviderNetboxClient)
+//	netboxService := new(models.WritableService)
+//	name := d.Get("name").(string)
+//	netboxService.Name = &name
+//	netboxService.Port = swag.Int64(int64(d.Get("port").(int)))
+//	netboxService.Protocol = swag.Int64(int64(d.Get("protocol").(int))) // todo: protocol map
+//	netboxService.VirtualMachine = d.Get("virtual_machine").(string) // todo find vm id by name
+//	netboxService.Ipaddresses = d.Get("description").(string) // todo conver ipString to []Int64
+//	netboxService.Description = d.Get("description").(string)
+//	params := ipam.NewIPAMServicesCreateParams()
+//	params.WithData(netboxService)
+//
+//	res, err := c.netboxClient.IPAM.IPAMServicesCreate(params, nil)
+//	if err != nil {
+//		log.Print(err)
+//		return err
+//	}
+//
+//	log.Print("Service ID is: ", res.Payload.ID)
+//	d.SetId(strconv.FormatInt(res.Payload.ID, 10))
+//	return resourceRackRead(d, m)
+//}
+//
+//func resourceServiceRead(d *schema.ResourceData, m interface{}) error {
+//	c := m.(*ProviderNetboxClient).netboxClient
+//	params := dcim.NewDcimRacksListParams()
+//	//todo: Search by name or ID if provided
+//	switch {
+//	case d.Id() != "":
+//		params.WithID(swag.String(d.Id()))
+//	case d.Get("name") != nil:
+//		name := d.Get("name").(string)
+//		params.WithName(&name)
+//	}
+//	res, err := c.Dcim.DcimRacksList(params, nil)
+//	if err != nil {
+//		log.Print("[DEBUG] Cant read Rack info resourceRackRead() ", err)
+//	}
+//	d.Set("name", res.Payload.Results[0].Name)
+//	d.Set("site", res.Payload.Results[0].Site.Name)
+//	d.Set("tenant", res.Payload.Results[0].Tenant.Name)
+//	d.Set("height", res.Payload.Results[0].UHeight)
+//	d.Set("width", res.Payload.Results[0].Width.Value)
+//	d.Set("facility", res.Payload.Results[0].FacilityID)
+//	d.Set("desc_units", res.Payload.Results[0].DescUnits)
+//
+//	return nil
+//}
+//func resourceServiceUpdate(d *schema.ResourceData, m interface{}) error {
+//	c := m.(*ProviderNetboxClient)
+//	netboxRack := new(models.WritableRack)
+//	name := d.Get("name").(string)
+//
+//	netboxRack.Name = &name
+//	netboxRack.Site = c.GetSiteID(swag.String(d.Get("site").(string)))
+//	netboxRack.Tenant = c.GetTenantId(swag.String(d.Get("tenant").(string)))
+//	netboxRack.UHeight = int64(d.Get("height").(int))
+//	netboxRack.Width = int64(d.Get("width").(int))
+//	netboxRack.Tags = []string{}
+//	facility := d.Get("facility").(string)
+//	netboxRack.FacilityID = &facility
+//	netboxRack.DescUnits = d.Get("desc_units").(bool)
+//
+//	params := dcim.NewDcimRacksPartialUpdateParams()
+//	rackID, err := strconv.Atoi(d.Id())
+//	if err != nil {
+//		log.Print("string converting failed")
+//	}
+//	params.WithID(int64(rackID))
+//	params.WithData(netboxRack)
+//	_, err = c.netboxClient.Dcim.DcimRacksPartialUpdate(params, nil)
+//	if err != nil {
+//		log.Print("[DEBUG] Update Rack failed\n", err)
+//	} else {
+//		log.Print("Updated...")
+//	}
+//
+//	return resourceRackRead(d, m)
+//}
+//
+//func resourceServiceDelete(d *schema.ResourceData, m interface{}) error {
+//	c := m.(*ProviderNetboxClient).netboxClient
+//	params := dcim.NewDcimRacksDeleteParams()
+//	rackID, err := strconv.Atoi(d.Id())
+//	if err != nil {
+//		log.Print("string converting failed")
+//	}
+//	params.WithID(int64(rackID))
+//	_, err = c.Dcim.DcimRacksDelete(params, nil)
+//	if err != nil {
+//		log.Print("[DEBUG] Delete Rack failed\n", err)
+//	}
+//
+//	return nil
+//}
+

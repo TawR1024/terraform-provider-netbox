@@ -120,27 +120,17 @@ func resourceDeviceRead(d *schema.ResourceData, m interface{}) error {
 		log.Print("[DEBUG] Cant read Rack info resourceDeviceRead() ", err)
 	}
 	d.Set("name", res.Payload.Results[0].Name)
-	log.Print("[DEBUG] name OK")
 	d.Set("site", res.Payload.Results[0].Site.Name)
-	log.Print("[DEBUG] site OK")
 	d.Set("tenant", res.Payload.Results[0].Tenant.Name)
-	log.Print("[DEBUG] tenant OK")
-	d.Set("type", res.Payload.Results[0].DeviceType.Slug)
-	log.Print("[DEBUG] type OK")
+	d.Set("type", res.Payload.Results[0].DeviceType.Model)
 	d.Set("role", res.Payload.Results[0].DeviceRole.Name)
-	log.Print("[DEBUG] role OK")
 	d.Set("rack", res.Payload.Results[0].Rack.Name)
-	log.Print("[DEBUG] rack OK")
 	d.Set("position", res.Payload.Results[0].Position)
-	log.Print("[DEBUG] position OK")
 	if res.Payload.Results[0].Face != nil {
 		d.Set("face", res.Payload.Results[0].Face.Value)
-		log.Print("[DEBUG] face OK")
 	}
 	d.Set("status", res.Payload.Results[0].Status.Label)
-	log.Print("[DEBUG] status OK")
 	d.Set("serial", res.Payload.Results[0].Serial)
-	log.Print("[DEBUG] serial OK")
 
 	return nil
 }
