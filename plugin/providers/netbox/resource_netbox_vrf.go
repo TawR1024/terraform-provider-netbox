@@ -98,11 +98,11 @@ func resourceVRFUpdate(d *schema.ResourceData, m interface{}) error {
 func resourceVRFDelete(d *schema.ResourceData, m interface{}) error {
 	c := m.(*ProviderNetboxClient).netboxClient
 	params := ipam.NewIPAMVrfsDeleteParams()
-	rackID, err := strconv.Atoi(d.Id())
+	vrfID, err := strconv.Atoi(d.Id())
 	if err != nil {
 		log.Print("string converting failed")
 	}
-	params.WithID(int64(rackID))
+	params.WithID(int64(vrfID))
 	_, err = c.IPAM.IPAMVrfsDelete(params, nil)
 	if err != nil {
 		log.Print("[DEBUG] Delete VRF failed\n", err)

@@ -21,6 +21,7 @@ func Provider() terraform.ResourceProvider {
 			"netbox_interface":       resourceNetboxInterface(),
 			"netbox_cable":           resourceNetboxCable(),
 			"netbox_vrf":             resourceNetboxVRF(),
+			"netbox_prefix":          resourceNetboxPrefix(),
 			//"netbox_service":         resourceNetboxService(),
 		},
 		Schema: map[string]*schema.Schema{

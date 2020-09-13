@@ -153,11 +153,11 @@ func resourceDeviceUpdate(d *schema.ResourceData, m interface{}) error {
 	netboxDevice.Tags = []string{}
 
 	params := dcim.NewDcimDevicesPartialUpdateParams()
-	rackID, err := strconv.Atoi(d.Id())
+	deviceID, err := strconv.Atoi(d.Id())
 	if err != nil {
 		log.Print("string converting failed")
 	}
-	params.WithID(int64(rackID))
+	params.WithID(int64(deviceID))
 	params.WithData(netboxDevice)
 	_, err = c.netboxClient.Dcim.DcimDevicesPartialUpdate(params, nil)
 	if err != nil {

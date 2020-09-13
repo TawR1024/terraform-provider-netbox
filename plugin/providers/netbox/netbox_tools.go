@@ -1,19 +1,23 @@
 package netbox
 
 import (
-	"github.com/go-openapi/swag"
 	"log"
 	"strings"
+
+	"github.com/go-openapi/swag"
 
 	"github.com/netbox-community/go-netbox/netbox/client/tenancy"
 
 	"github.com/netbox-community/go-netbox/netbox/client/dcim"
+	"github.com/netbox-community/go-netbox/netbox/client/ipam"
 	"github.com/netbox-community/go-netbox/netbox/client/virtualization"
+	//log "github.com/sirupsen/logrus"
 )
 
 var status = map[string]int64{
 	"Active":  1,
 	"Planned": 2,
+	"Staged":  3,
 }
 
 func (c *ProviderNetboxClient) GetSiteID(siteName *string) *int64 {
@@ -42,7 +46,7 @@ func (c *ProviderNetboxClient) GetClusterID(clusterName *string) *int64 {
 	params.WithName(clusterName)
 	res, err := c.netboxClient.Virtualization.VirtualizationClustersList(params, nil)
 	if err != nil {
-		log.Print("[DEBUG] Cant get cluster id ", err)
+		log.Printf("[DEBUG] Cant get cluster id ", err)
 	}
 	return &res.Payload.Results[0].ID
 }
@@ -53,7 +57,7 @@ func (c *ProviderNetboxClient) GetDeviceTypeId(deviceTypeName *string) *int64 {
 	params.WithSlug(&slug)
 	res, err := c.netboxClient.Dcim.DcimDeviceTypesList(params, nil)
 	if err != nil {
-		log.Print("[DEBUG] Cant get device type id ", err)
+		log.Printf("[DEBUG] Cant get device type id ", err)
 	}
 	return &res.Payload.Results[0].ID
 
@@ -79,7 +83,7 @@ func (c *ProviderNetboxClient) GetRackId(rackName *string, site *string) *int64 
 	if err != nil {
 		log.Print("[DEBUG] Cant Get Rack ID", err)
 	}
-	return &res.Payload.Results[0].ID	
+	return &res.Payload.Results[0].ID
 }
 
 func toslug(str string) string {
@@ -91,7 +95,7 @@ func toslug2(str string) string {
 }
 
 func siteSlug(str string) string {
-	return strings.ToLower(strings.ReplaceAll(strings.ReplaceAll(str,".", "_" ),"-","_"))
+	return strings.ToLower(strings.ReplaceAll(strings.ReplaceAll(str, ".", "_"), "-", "_"))
 }
 
 func (c *ProviderNetboxClient) GetInterfaceID(deviceName, interfaceName *string) (interfaceId *int64) {
@@ -104,5 +108,15 @@ func (c *ProviderNetboxClient) GetInterfaceID(deviceName, interfaceName *string)
 		log.Print("Cant Get Inteface ID ", err)
 	}
 
+	return &res.Payload.Results[0].ID
+}
+
+func (c *ProviderNetboxClient) GetVRFID(vrfName *string) (vrfID *int64) {
+	params := ipam.NewIPAMVrfsListParams()
+	params.WithName(vrfName)
+	res, err := c.netboxClient.IPAM.IPAMVrfsList(params, nil)
+	if err != nil {
+		log.Printf("Can't find VRF", err)
+	}
 	return &res.Payload.Results[0].ID
 }
