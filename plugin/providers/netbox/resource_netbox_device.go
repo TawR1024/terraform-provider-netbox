@@ -81,13 +81,20 @@ func resourceDeviceCreate(d *schema.ResourceData, m interface{}) error {
 	name := d.Get("name").(string)
 	netboxDevice.Name = &name
 	netboxDevice.Site = c.GetSiteID(swag.String(d.Get("site").(string)))
+	log.Printf("site: %d", netboxDevice.Site)
 	netboxDevice.Tenant = c.GetTenantId(swag.String(d.Get("tenant").(string)))
+	log.Printf("tenant: %d", netboxDevice.Tenant)
 	netboxDevice.DeviceType = c.GetDeviceTypeId(swag.String(d.Get("type").(string)))
+	log.Printf("type: %d", netboxDevice.DeviceType)
 	netboxDevice.DeviceRole = c.GetDeviceRoleId(swag.String(d.Get("role").(string)))
+	log.Printf("role: %d", netboxDevice.DeviceRole)
 	netboxDevice.Rack = c.GetRackId(swag.String(d.Get("rack").(string)), swag.String(d.Get("site").(string)))
+	log.Printf("rack: %d", netboxDevice.Rack)
 	netboxDevice.Position = swag.Int64(int64(d.Get("position").(int)))
+	log.Printf("position: %d", netboxDevice.Position)
 	netboxDevice.Face = swag.Int64(int64(d.Get("face").(int)))
 	netboxDevice.Status = status[d.Get("status").(string)]
+	log.Printf("status: %d", netboxDevice.Status)
 	netboxDevice.Serial = d.Get("serial").(string)
 	netboxDevice.Tags = []string{}
 

@@ -59,6 +59,7 @@ func (c *ProviderNetboxClient) GetDeviceTypeId(deviceTypeName *string) *int64 {
 	if err != nil {
 		log.Printf("[DEBUG] Cant get device type id ", err)
 	}
+	log.Printf("typeID: %d", res)
 	return &res.Payload.Results[0].ID
 
 }
