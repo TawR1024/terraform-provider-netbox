@@ -46,7 +46,7 @@ func (c *ProviderNetboxClient) GetClusterID(clusterName *string) *int64 {
 	params.WithName(clusterName)
 	res, err := c.netboxClient.Virtualization.VirtualizationClustersList(params, nil)
 	if err != nil {
-		log.Printf("[DEBUG] Cant get cluster id ", err)
+		log.Print("[DEBUG] Cant get cluster id ", err)
 	}
 	return &res.Payload.Results[0].ID
 }
@@ -57,9 +57,9 @@ func (c *ProviderNetboxClient) GetDeviceTypeId(deviceTypeName *string) *int64 {
 	params.WithSlug(&slug)
 	res, err := c.netboxClient.Dcim.DcimDeviceTypesList(params, nil)
 	if err != nil {
-		log.Printf("[DEBUG] Cant get device type id ", err)
+		log.Print("[DEBUG] Cant get device type id ", err)
 	}
-	log.Printf("typeID: %d", res)
+	log.Printf("typeID: %d", res.Payload.Results[0].ID)
 	return &res.Payload.Results[0].ID
 
 }
@@ -117,7 +117,7 @@ func (c *ProviderNetboxClient) GetVRFID(vrfName *string) (vrfID *int64) {
 	params.WithName(vrfName)
 	res, err := c.netboxClient.IPAM.IPAMVrfsList(params, nil)
 	if err != nil {
-		log.Printf("Can't find VRF", err)
+		log.Print("Can't find VRF", err)
 	}
 	return &res.Payload.Results[0].ID
 }
