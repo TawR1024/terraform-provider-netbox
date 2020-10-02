@@ -49,7 +49,7 @@ func resourceVRFCreate(d *schema.ResourceData, m interface{}) error {
 	}
 	log.Print("Vrf ID is: ", res.Payload.ID)
 	d.SetId(strconv.FormatInt(res.Payload.ID, 10))
-	//return resourceVRFRead(d, m)
+	return resourceVRFRead(d, m)
 	return nil
 }
 
@@ -58,7 +58,7 @@ func resourceVRFRead(d *schema.ResourceData, m interface{}) error {
 	params := ipam.NewIPAMVrfsListParams()
 	switch {
 	case d.Id() != "":
-		params.WithName(swag.String(d.Id()))
+		params.WithIDIn(swag.String(d.Id()))
 	case d.Get("name") != nil:
 		name := d.Get("name").(string)
 		params.WithName(&name)

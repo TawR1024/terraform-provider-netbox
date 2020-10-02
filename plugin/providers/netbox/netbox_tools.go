@@ -20,6 +20,11 @@ var status = map[string]int64{
 	"Staged":  3,
 }
 
+var protocol = map[string]int64{
+	"TCP": 6,
+	"UDP": 17,
+}
+
 func (c *ProviderNetboxClient) GetSiteID(siteName *string) *int64 {
 	params := dcim.NewDcimSitesListParams()
 	siteSlug := siteSlug(*siteName)
@@ -38,6 +43,7 @@ func (c *ProviderNetboxClient) GetTenantId(tenantName *string) *int64 {
 	if err != nil {
 		log.Print("[DEBUG] Cant get tenant id ", err)
 	}
+
 	return &res.Payload.Results[0].ID
 }
 
@@ -118,6 +124,16 @@ func (c *ProviderNetboxClient) GetVRFID(vrfName *string) (vrfID *int64) {
 	res, err := c.netboxClient.IPAM.IPAMVrfsList(params, nil)
 	if err != nil {
 		log.Print("Can't find VRF", err)
+	}
+	return &res.Payload.Results[0].ID
+}
+
+func (c *ProviderNetboxClient) GetRackRoleID(roleName *string) (roleId *int64) {
+	params := dcim.NewDcimRackRolesListParams()
+	params.WithName(roleName)
+	res, err := c.netboxClient.Dcim.DcimRackRolesList(params, nil)
+	if err != nil {
+		log.Print("Can't find rack role", err)
 	}
 	return &res.Payload.Results[0].ID
 }

@@ -53,6 +53,11 @@ func resourceNetboxRack() *schema.Resource {
 				Required:    true,
 				Description: "Descending units",
 			},
+			"role": &schema.Schema{
+				Type:        schema.TypeInt,
+				Required:    true,
+				Description: "Rack role project.zone",
+			},
 		},
 	}
 }
