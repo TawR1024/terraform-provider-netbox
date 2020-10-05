@@ -50,7 +50,6 @@ func resourceVRFCreate(d *schema.ResourceData, m interface{}) error {
 	log.Print("Vrf ID is: ", res.Payload.ID)
 	d.SetId(strconv.FormatInt(res.Payload.ID, 10))
 	return resourceVRFRead(d, m)
-	return nil
 }
 
 func resourceVRFRead(d *schema.ResourceData, m interface{}) error {

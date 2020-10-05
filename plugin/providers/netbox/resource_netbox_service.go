@@ -40,9 +40,9 @@ func resourceNetboxService() *schema.Resource {
 				Description: "DeviceID where service is runnig",
 			},
 			"description": &schema.Schema{
-				Type:        schema.TypeBool,
+				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Descending units",
+				Description: "service description",
 			},
 		},
 	}
@@ -56,7 +56,8 @@ func resourceServiceCreate(d *schema.ResourceData, m interface{}) error {
 	netboxService.Port = swag.Int64(int64(d.Get("port").(int)))
 	netboxService.Protocol = swag.Int64(protocol[d.Get("protocol").(string)])
 	netboxService.Description = d.Get("description").(string)
-	netboxService.Device = swag.Int64(d.Get("device_id").(int64))
+	netboxService.Device = swag.Int64(int64(d.Get("device_id").(int)))
+	netboxService.Ipaddresses = []int64{}
 	params := ipam.NewIPAMServicesCreateParams()
 	params.WithData(netboxService)
 
@@ -102,7 +103,8 @@ func resourceServiceUpdate(d *schema.ResourceData, m interface{}) error {
 	netboxService.Port = swag.Int64(int64(d.Get("port").(int)))
 	netboxService.Protocol = swag.Int64(protocol[d.Get("protocol").(string)])
 	netboxService.Description = d.Get("description").(string)
-	netboxService.Device = swag.Int64(d.Get("device_id").(int64))
+	netboxService.Device = swag.Int64(int64(d.Get("device_id").(int)))
+	netboxService.Ipaddresses = []int64{}
 
 	params := ipam.NewIPAMServicesUpdateParams()
 	serviceID, err := strconv.Atoi(d.Id())
@@ -118,7 +120,7 @@ func resourceServiceUpdate(d *schema.ResourceData, m interface{}) error {
 		log.Print("Updated...")
 	}
 
-	return resourceRackRead(d, m)
+	return resourceServiceRead(d, m)
 }
 
 func resourceServiceDelete(d *schema.ResourceData, m interface{}) error {
